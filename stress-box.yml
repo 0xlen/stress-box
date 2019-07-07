@@ -13,6 +13,9 @@ Parameters:
   ServiceName:
     Type: String
     Default: stress-test
+  DefaultURL:
+    Type: String
+    Default: 'http://STEM-Applic-1798UTBNCKL6V-596377856.us-west-1.elb.amazonaws.com'
 
 Resources:
   LogGroup:
@@ -46,12 +49,14 @@ Resources:
             - "sh"
             - "-c"
           Command:
-            - 'set -x; /usr/local/bin/wrk -t 100 -c 2000 -d "$TIME" "$URL"'
+            - 'set -x; while true; do /usr/local/bin/wrk -t "$THREAD" -c "$CONNECTION" "$URL"; done'
           Environment:
-            - Name: TIME
-              Value: 600s
+            - Name: THREAD
+              Value: 4
+            - Name: CONNECTION
+              Value: 70000
             - Name: URL
-              Value: http://STEM-Applic-1798UTBNCKL6V-596377856.us-west-1.elb.amazonaws.com
+              Value: !Ref DefaultURL
           Ulimits:
             - Name: nofile
               HardLimit: 1024000
